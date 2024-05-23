@@ -112,6 +112,19 @@ int main() {
             }
         }
 
+        if (strcmp(input, "5") == 0) {
+
+            for (int i = 0; i <= nrow; i++) {
+                if (i > 0) {
+                    printf("\n");
+                }
+                for (int j = 0; j < COLS; j++)
+                    printf("%c", array[i][j]);
+            }
+
+            printf("\n");
+        }
+
 
         free(input);
 
