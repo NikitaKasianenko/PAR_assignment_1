@@ -58,6 +58,60 @@ int main() {
             printf("New line is started\n");
         }
 
+        if (strcmp(input, "3") == 0) {
+            file = fopen("C:\\Windows\\Temp\\test.txt", "w");
+
+            if (file == NULL) {
+                printf("Can't open file\n");
+            }
+
+            if (file != NULL) {
+                for (int i = 0; i <= nrow; i++) {
+                    for (int b = 0; b < COLS; b++) {
+                        fputc(array[i][b], file);
+
+                    }
+                    fputc('\n', file);
+                }
+                fclose(file);
+            }
+        }
+
+        if (strcmp(input, "4") == 0) {
+            nrow = 0;
+            printf("Enter path to file: ");
+            fgets(input, bufferSize, stdin);
+            input[strcspn(input, "\n")] = '\0';
+
+            char mystring[100];
+            file = fopen(input, "r");
+            if (file == NULL)
+            {
+                printf("Error opening file");
+            }
+            else
+            {
+                int row = 0;
+                while (fgets(mystring, 100, file) != NULL)
+                {
+
+
+                    for (int i = 0; i < strlen(mystring); i++) {
+
+                        if (mystring[i] == '\n') {
+                            array[row][i] = '\0';
+                        }
+                        else {
+                            array[row][i] = mystring[i];
+                        }
+                    }
+                    row++;
+                }
+                nrow = row;
+                fclose(file);
+            }
+        }
+
 
         free(input);
 
