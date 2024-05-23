@@ -150,6 +150,35 @@ int main() {
 
         }
 
+        if (strcmp(input, "7") == 0) {
+            printf("Enter text to search: ");
+            fgets(input, bufferSize, stdin);
+            input[strcspn(input, "\n")] = '\0';
+            char* to_search = input;
+            bool found = false;
+            char* name = NULL;
+
+            for (int i = 0; i <= nrow; i++) {
+
+                name = strstr(array[i], to_search);
+                if (name) {
+
+                    printf("Substring found at index: %d %d\n", i, ((int)name - (int)array[i]));
+                    found = true;
+                }
+            }
+
+            if (!found) {
+                printf("Substring not found\n");
+            }
+        }
+
+
+        if (strcmp(input, "exit") == 0) {
+            free(input);
+            break;
+        }
+
 
         free(input);
 
