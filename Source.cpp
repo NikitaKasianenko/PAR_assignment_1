@@ -125,6 +125,31 @@ int main() {
             printf("\n");
         }
 
+        if (strcmp(input, "6") == 0) {
+
+            int currow = 0;
+            int curcol = 0;
+
+            printf("Choose line and index: ");
+            fgets(input, bufferSize, stdin);
+            sscanf(input, "%d %d", &currow, &curcol);
+
+            printf("Enter text to insert: ");
+            fgets(input, bufferSize, stdin);
+            input[strcspn(input, "\n")] = '\0';
+            int text_length = strlen(input);
+
+            for (int i = strlen(array[currow]); i >= curcol; i--) {
+                array[currow][i + text_length] = array[currow][i];
+            }
+
+            for (int i = 0; i < text_length; i++) {
+                array[currow][curcol + i] = input[i];
+            }
+
+
+        }
+
 
         free(input);
 
