@@ -1,5 +1,4 @@
 #define _CRT_SECURE_NO_WARNINGS
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,6 +19,10 @@ void initialize_array() {
     }
     for (int i = 0; i < initialRowCount; i++) {
         array[i] = (char*)malloc(bufferSize * sizeof(char));
+        if (array[i] == NULL) {
+            printf("Memory allocation failed.");
+            exit(1);
+        }
         array[i][0] = '\0';
     }
 }
@@ -31,7 +34,7 @@ void newBuffer(size_t* bufferSize) {
 
 
 void freeArray() {
-    for (int i = 0; i <= initialRowCount; i++)
+    for (int i = 0; i < initialRowCount; i++)
         free(array[i]);
     free(array);
 }
@@ -57,6 +60,7 @@ void reallocate_rows() {
     }
 }
 
+
 char* user_input(size_t* bufferSize) {
     char* input = (char*)malloc(*bufferSize * sizeof(char));
     if (input == NULL) {
@@ -72,7 +76,7 @@ char* user_input(size_t* bufferSize) {
             *bufferSize = *bufferSize * 2;
             input = (char*)realloc(input, *bufferSize * sizeof(char));
             if (input == NULL) {
-                printf("Memory allocation failed.\n");
+                printf("Memory allocation failed.");
                 exit(1);
             }
         }
@@ -82,6 +86,7 @@ char* user_input(size_t* bufferSize) {
 
     return input;
 }
+
 
 void append_text() {
     char* input = NULL;
@@ -109,6 +114,8 @@ void new_line() {
     ncol = 0;
     printf("New line is started\n");
 }
+
+
 void write_in_file() {
     file = fopen("C:\\Windows\\Temp\\text.txt", "w");
 
@@ -131,13 +138,15 @@ void write_in_file() {
 
 
 }
+
+
 void read_from_file() {
     nrow = 0;
     printf("Enter path to file: ");
     char* input = NULL;
     input = user_input(&bufferSize);
 
-    char mystring[100];
+    char mystring[1000];
     file = fopen(input, "r");
     if (file == NULL)
     {
@@ -148,7 +157,7 @@ void read_from_file() {
     else
     {
         int row = 0;
-        while (fgets(mystring, 100, file) != NULL)
+        while (fgets(mystring, 1000, file) != NULL)
         {
 
 
@@ -167,6 +176,7 @@ void read_from_file() {
         fclose(file);
     }
 }
+
 
 void print() {
 
@@ -327,13 +337,15 @@ int main() {
 
         if (strcmp(input, "10") == 0) {
             free(input);
-            freeArray();
+            //freeArray();
             break;
         }
 
         else {
             printf("The command is not implemented\n");
         }
+        
+        free(input);
 
     }
     return 0;
