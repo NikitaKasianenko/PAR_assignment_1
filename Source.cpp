@@ -199,9 +199,9 @@ void insert_text() {
     while (1) {
         printf("Choose line and index: ");
         input = user_input(&bufferSize);
+        sscanf(input, "%d %d", &currow, &curcol);
 
-        if (sscanf(input, "%d %d", &currow, &curcol) == 2 &&
-            currow >= 0 && currow < initialRowCount &&
+        if (currow >= 0 && currow < initialRowCount &&
             curcol >= 0 && curcol <= strlen(array[currow])) {
             free(input);
             break;
