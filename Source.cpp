@@ -14,11 +14,14 @@ char** array = NULL;
 
 void initialize_array() {
     array = (char**)malloc(initialRowCount * sizeof(char*));
+    if (array == NULL) {
+        printf("Memory allocation failed.");
+        exit(1);
+    }
     for (int i = 0; i < initialRowCount; i++) {
         array[i] = (char*)malloc(bufferSize * sizeof(char));
         array[i][0] = '\0';
     }
-
 }
 
 
@@ -33,18 +36,21 @@ void freeArray() {
     free(array);
 }
 
-    
+
 void reallocate_rows() {
+
     initialRowCount *= 2;
     array = (char**)realloc(array, initialRowCount * sizeof(char*));
+
     if (array == NULL) {
-        printf("Memory reallocation failed. Exiting...\n");
+        printf("Memory allocation failed.");
         exit(1);
     }
+
     for (int i = nrow; i < initialRowCount; i++) {
         array[i] = (char*)malloc(bufferSize * sizeof(char));
         if (array[i] == NULL) {
-            printf("Memory allocation failed. Exiting...\n");
+            printf("Memory allocation failed.");
             exit(1);
         }
         array[i][0] = '\0';
@@ -54,7 +60,7 @@ void reallocate_rows() {
 char* user_input(size_t* bufferSize) {
     char* input = (char*)malloc(*bufferSize * sizeof(char));
     if (input == NULL) {
-        printf("Memory allocation failed.\n");
+        printf("Memory allocation failed.");
         exit(1);
     }
 
@@ -63,10 +69,10 @@ char* user_input(size_t* bufferSize) {
 
     while ((symbol = getchar()) != '\n') {
         if (length >= *bufferSize - 1) {
-            *bufferSize = *bufferSize*2;
+            *bufferSize = *bufferSize * 2;
             input = (char*)realloc(input, *bufferSize * sizeof(char));
             if (input == NULL) {
-                printf("Memory reallocation failed.\n");
+                printf("Memory allocation failed.\n");
                 exit(1);
             }
         }
@@ -81,7 +87,16 @@ void append_text() {
     char* input = NULL;
     printf("Enter text to append: ");
     input = user_input(&bufferSize);
-   
+
+    if (ncol + strlen(input) >= bufferSize - 1) {
+        newBuffer(&bufferSize);
+        array[nrow] = (char*)realloc(array[nrow], bufferSize * sizeof(char));
+        if (array[nrow] == NULL) {
+            printf("Memory allocation failed.");
+            exit(1);
+        }
+    }
+
     for (int i = 0; i <= strlen(input); i++) {
         array[nrow][i + ncol] = input[i];
 
@@ -99,6 +114,7 @@ void write_in_file() {
 
     if (file == NULL) {
         printf("Can't open file\n");
+        return;
     }
 
     if (file != NULL) {
@@ -126,6 +142,8 @@ void read_from_file() {
     if (file == NULL)
     {
         printf("Error opening file");
+        free(input);
+        return;
     }
     else
     {
@@ -168,12 +186,36 @@ void insert_text() {
     int currow = 0;
     int curcol = 0;
 
-    printf("Choose line and index: ");
-    input = user_input(&bufferSize);
-    sscanf(input, "%d %d", &currow, &curcol);   
+    while (1) {
+        printf("Choose line and index: ");
+        input = user_input(&bufferSize);
+
+        if (sscanf(input, "%d %d", &currow, &curcol) == 2 &&
+            currow >= 0 && currow < initialRowCount &&
+            curcol >= 0 && curcol <= strlen(array[currow])) {
+            free(input);
+            break;
+        }
+
+        free(input);
+        printf("Choose correct index separated by space in format 'x y'\n");
+    }
+
     printf("Enter text to insert: ");
     input = user_input(&bufferSize);
+
     int text_length = strlen(input);
+
+    while (text_length + strlen(array[currow]) >= bufferSize - 1) {
+        newBuffer(&bufferSize);
+        array[currow] = (char*)realloc(array[currow], bufferSize * sizeof(char));
+        if (array[currow] == NULL) {
+            printf("Memory allocation failed");
+            free(input);
+            exit(1);
+        }
+
+    }
 
     for (int i = strlen(array[currow]); i >= curcol; i--) {
         array[currow][i + text_length] = array[currow][i];
@@ -182,8 +224,7 @@ void insert_text() {
     for (int i = 0; i < text_length; i++) {
         array[currow][curcol + i] = input[i];
     }
-
-
+    free(input);
 }
 void search() {
 
@@ -198,7 +239,6 @@ void search() {
 
         name = strstr(array[i], to_search);
         if (name) {
-
             printf("Substring found at index: %d %d\n", i, ((int)name - (int)array[i]));
             found = true;
         }
@@ -207,6 +247,7 @@ void search() {
     if (!found) {
         printf("Substring not found\n");
     }
+    free(input);
 }
 void help() {
     printf("You open a text redactor with this functions:\n");
@@ -228,7 +269,7 @@ int main() {
     help();
     char* input = NULL;
 
-    
+
 
     while (1) {
 
@@ -247,11 +288,11 @@ int main() {
             continue;
         }
 
-        if (strcmp(input,"2")== 0) {
+        if (strcmp(input, "2") == 0) {
             new_line();
             free(input);
             continue;
-            
+
         }
 
         if (strcmp(input, "3") == 0) {
@@ -272,7 +313,7 @@ int main() {
             continue;
         }
 
-        if (strcmp(input, "6") ==0) {
+        if (strcmp(input, "6") == 0) {
             insert_text();
             free(input);
             continue;
@@ -288,12 +329,12 @@ int main() {
             free(input);
             freeArray();
             break;
-        }   
+        }
 
-        else{
+        else {
             printf("The command is not implemented\n");
         }
-        
+
     }
     return 0;
-} 
+}
