@@ -107,6 +107,7 @@ void append_text() {
 
     }
     ncol += strlen(input);
+    free(input);
 }
 
 void new_line() {
@@ -160,36 +161,21 @@ void read_from_file() {
     free(input);
     if (file == NULL)
     {
-        printf("Error opening file");
+        printf("Error opening file\n");
         return;
     }
     else
     {
         while (fgets(mystring, 1000, file) != NULL)
         {
-            while (strlen(mystring) >= bufferSize - 1) {
-                newBuffer(&bufferSize);
-                array[nrow] = (char*)realloc(array[nrow], bufferSize * sizeof(char));
-            }
-
-            while (nrow >= bufferSize - 1) {
+            if (nrow >= initialRowCount) {
                 reallocate_rows();
             }
-
             
-            for (int i = 0; i < strlen(mystring); i++) {
-                if (mystring[i] == '\n') {
-                    array[nrow][i] = '\0';
-                    break;
-                }
-                else {
-                    array[nrow][i] = mystring[i];
-                }
-            }
-            array[nrow][strlen(mystring)] = '\0';
+            strncpy(array[nrow], mystring, strlen(mystring));
+            array[nrow][strlen(mystring) - 1] = '\0';
             nrow++;
         }
-        nrow--;
 
         fclose(file);
     }
@@ -229,6 +215,7 @@ void insert_text() {
         printf("Choose correct index separated by space in format 'x y'\n");
     }
 
+    free(input);
     printf("Enter text to insert: ");
     input = user_input(&bufferSize);
 
@@ -252,6 +239,7 @@ void insert_text() {
     for (int i = 0; i < text_length; i++) {
         array[currow][curcol + i] = input[i];
     }
+
     free(input);
 }
 void search() {
@@ -351,7 +339,7 @@ int main() {
 
         if (strcmp(input, "10") == 0) {
             free(input);
-            //freeArray();
+            freeArray();
             break;
         }
 
