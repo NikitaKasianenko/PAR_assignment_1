@@ -112,14 +112,22 @@ void append_text() {
 void new_line() {
     nrow++;
     ncol = 0;
+    if (nrow >= initialRowCount) {
+        reallocate_rows();
+    }
+
     printf("New line is started\n");
 }
 
 
 void write_in_file() {
-    file = fopen("C:\\Windows\\Temp\\text.txt", "w");
+    printf("Enter the file name for saving: ");
+    char* input = user_input(&bufferSize);
+    char path[256];
+    sprintf(path, "C:\\Windows\\Temp\\%s.txt", input);
+    file = fopen(path, "w");
 
-    if (file == NULL) {
+    if (file == NULL) { 
         printf("Can't open file\n");
         return;
     }
@@ -136,6 +144,8 @@ void write_in_file() {
         fclose(file);
     }
 
+    free(input);
+
 
 }
 
@@ -143,36 +153,44 @@ void write_in_file() {
 void read_from_file() {
     nrow = 0;
     printf("Enter path to file: ");
-    char* input = NULL;
-    input = user_input(&bufferSize);
+    char* input = user_input(&bufferSize);
 
     char mystring[1000];
     file = fopen(input, "r");
+    free(input);
     if (file == NULL)
     {
         printf("Error opening file");
-        free(input);
         return;
     }
     else
     {
-        int row = 0;
         while (fgets(mystring, 1000, file) != NULL)
         {
+            while (strlen(mystring) >= bufferSize - 1) {
+                newBuffer(&bufferSize);
+                array[nrow] = (char*)realloc(array[nrow], bufferSize * sizeof(char));
+            }
 
+            while (nrow >= bufferSize - 1) {
+                reallocate_rows();
+            }
 
+            
             for (int i = 0; i < strlen(mystring); i++) {
-
                 if (mystring[i] == '\n') {
-                    array[row][i] = '\0';
+                    array[nrow][i] = '\0';
+                    break;
                 }
                 else {
-                    array[row][i] = mystring[i];
+                    array[nrow][i] = mystring[i];
                 }
             }
-            row++;
+            array[nrow][strlen(mystring)] = '\0';
+            nrow++;
         }
-        nrow = row;
+        nrow--;
+
         fclose(file);
     }
 }
@@ -286,11 +304,7 @@ int main() {
         printf("Choose the command: ");
         input = user_input(&bufferSize);
 
-        if (nrow >= initialRowCount) {
-            reallocate_rows();
-            free(input);
-            continue;
-        }
+        
 
         if (strcmp(input, "1") == 0) {
             append_text();
