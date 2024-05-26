@@ -34,8 +34,11 @@ void newBuffer(size_t* bufferSize) {
 
 
 void freeArray() {
-    for (int i = 0; i < initialRowCount; i++)
-        free(array[i]);
+   for (int i = 0; i < nrow; i++) {
+        if (array[i] != NULL) {
+            free(array[i]);
+        }
+    } 
     free(array);
 }
 
