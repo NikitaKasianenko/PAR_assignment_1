@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-size_t bufferSize = 5; // Initial buffer size
+size_t bufferSize = 256; // Initial buffer size
 FILE* file;
 int initialRowCount = 10;
 int nrow = 0;
@@ -34,11 +34,11 @@ void newBuffer(size_t* bufferSize) {
 
 
 void freeArray() {
-   for (int i = 0; i < nrow; i++) {
+    for (int i = 0; i <= nrow; i++) {
         if (array[i] != NULL) {
             free(array[i]);
         }
-    } 
+    }
     free(array);
 }
 
@@ -131,7 +131,7 @@ void write_in_file() {
     sprintf(path, "C:\\Windows\\Temp\\%s.txt", input);
     file = fopen(path, "w");
 
-    if (file == NULL) { 
+    if (file == NULL) {
         printf("Can't open file\n");
         return;
     }
@@ -174,7 +174,7 @@ void read_from_file() {
             if (nrow >= initialRowCount) {
                 reallocate_rows();
             }
-            
+
             strncpy(array[nrow], mystring, strlen(mystring));
             array[nrow][strlen(mystring) - 1] = '\0';
             nrow++;
@@ -206,25 +206,24 @@ void insert_text() {
     while (1) {
         printf("Choose line and index: ");
         input = user_input(&bufferSize);
-        sscanf(input, "%d %d", &currow, &curcol);
-
-        if (currow >= 0 && currow < initialRowCount &&
-            curcol >= 0 && curcol <= strlen(array[currow])) {
-            free(input);
-            break;
+        if (sscanf(input, "%d %d", &currow, &curcol) == 2) {
+            if (currow >= 0 && currow <= nrow &&
+                curcol >= 0 && curcol <= (int)strlen(array[currow])) {
+                free(input);
+                break;
+            }
         }
 
         free(input);
         printf("Choose correct index separated by space in format 'x y'\n");
     }
 
-    free(input);
     printf("Enter text to insert: ");
     input = user_input(&bufferSize);
 
     int text_length = strlen(input);
 
-    while (text_length + strlen(array[currow]) >= bufferSize - 1) {
+    if (text_length + strlen(array[currow]) >= bufferSize) {
         newBuffer(&bufferSize);
         array[currow] = (char*)realloc(array[currow], bufferSize * sizeof(char));
         if (array[currow] == NULL) {
@@ -295,7 +294,7 @@ int main() {
         printf("Choose the command: ");
         input = user_input(&bufferSize);
 
-        
+
 
         if (strcmp(input, "1") == 0) {
             append_text();
@@ -349,7 +348,7 @@ int main() {
         else {
             printf("The command is not implemented\n");
         }
-        
+
         free(input);
 
     }
